@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Room Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #0f718a;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        .room {
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Multi-color building-style backgrounds */
+        .room:nth-child(6n+1) { background-color: #f08080; }
+        .room:nth-child(6n+2) { background-color: #ffcccb; }
+        .room:nth-child(6n+3) { background-color: #add8e6; }
+        .room:nth-child(6n+4) { background-color: #90ee90; }
+        .room:nth-child(6n+5) { background-color: #00c3ff; }
+        .room:nth-child(6n+6) { background-color: #927aff; }
+
+        .occupied {
+            background-color: #1c8b00 !important;
+        }
+
+        .timer {
+            font-size: 12px;
+            color: rgb(145, 255, 0);
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>KISII UNIVERSITY TC BLOCK</h1>
+    <div class="controls">
+        <button onclick="showAvailable()">Show Available Rooms</button>
+    </div>
+    <div class="room-grid" id="roomGrid">
+        <!-- Rooms will be generated here dynamically -->
+    </div>
+
+    <script>
+        const totalRooms = 52;
+        const roomGrid = document.getElementById('roomGrid');
+
+        // Generate rooms dynamically
+        for (let i = 1; i <= totalRooms; i++) {
+            const room = document.createElement('div');
+            room.textContent = `TC ${i}`;
+            room.classList.add('room');
+            room.addEventListener('click', () => toggleOccupied(room));
+            roomGrid.appendChild(room);
+        }
+
+        // Function to toggle room occupation and set timer
+        function toggleOccupied(room) {
+            if (!room.classList.contains('occupied')) {
+                room.classList.add('occupied');
+                const timer = document.createElement('span');
+                timer.classList.add('timer');
+                const endTime = new Date().getTime() + 2 * 60 * 60 * 1000; // 2 hours from now
+                const interval = setInterval(() => updateTime(timer, endTime, room, interval), 1000);
+                room.appendChild(timer);
+            }
+        }
+
+        // Function to update remaining time
+        function updateTime(timer, endTime, room, interval) {
+            const remaining = Math.max(0, endTime - new Date().getTime());
+            if (remaining === 0) {
+                clearInterval(interval);
+                room.classList.remove('occupied');
+                if (timer.parentElement) timer.parentElement.removeChild(timer);
+            } else {
+                const hours = Math.floor(remaining / (1000 * 60 * 60));
+                const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                timer.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+        }
+
+        // Function to show available rooms
+        function showAvailable() {
+            const rooms = document.querySelectorAll('.room');
+            alert(`Available Rooms: ${
+                Array.from(rooms)
+                    .filter(room => !room.classList.contains('occupied'))
+                    .map(room => room.textContent)
+                    .join(', ')
+            }`);
+        }
+    </script>
+</body>
+</html>
